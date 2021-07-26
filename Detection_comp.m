@@ -23,7 +23,7 @@ scale=10.^(3/2.*Mw+9.1)/(3.98e13); % scales seismograms to desired magnitude
 % get records without noise
 for k=1:179 % distances
  
-    record_name=strcat('/Users/marusiak/Documents/Gattaca/Europa_constant_Tc/Europa_',...
+    record_name=strcat('Records/Europa_',...
         num2str(ice_thickness),'km_',event_depth,'/',num2str(k,'%03d'),'_MX');
     
     if k==10
@@ -293,9 +293,7 @@ spectrogram((diff(record_Z_10(:,2),2).*scale(jj)+nt),50,40,logspace(-1.5,1.5,100
 set(gca, 'YScale', 'log')
 title(['Vertical Mw ', num2str(Mw(jj)),' with noise'])
 %caxis([-156 -151])
-addpath('/Users/marusiak/Documents/MATLAB/seizmo/')
-model=strcat('/Users/marusiak/Documents/GitHub/PlanetProfile/Europa',...
-    '/EuropaProfile_Seawater_35WtPct_Zb',num2str(ice_thickness),'km.tvel');
+  
 %%
 jj=2; % scale for desired magnitude 
 for h=1:179
@@ -354,10 +352,10 @@ figure(11)
 % plot periodogram vs instrument capabilities
 
 % load instrument responses from Panning
-STS2=load('/Users/marusiak/Documents/GitHub/EuropaNoise/noise_STS2.txt');
-geophone=load('/Users/marusiak/Documents/GitHub/EuropaNoise/noise_10HZ_geophone.txt');
-TC=load('/Users/marusiak/Documents/GitHub/EuropaNoise/noise_Trillium_Compact.txt');
-SP=load('/Users/marusiak/Documents/GitHub/EuropaNoise/noise_SP_Imperial.txt');
+STS2=load('noise_STS2.txt');
+geophone=load('noise_10HZ_geophone.txt');
+TC=load('noise_Trillium_Compact.txt');
+SP=load('noise_SP_Imperial.txt');
 
 plot(1./STS2(:,1),20.*log10(STS2(:,2)),'b')
 set(gca, 'XScale', 'log')
@@ -400,14 +398,14 @@ title([num2str(ice_thickness) ' km shell, ' num2str(event_depth) ', Vertical Com
 ice_thickness=20;
 for ff=1:179
     
-     record_name=strcat('/Users/marusiak/Documents/Gattaca/Europa_constant_Tc/Europa_',num2str(ice_thickness),...
+     record_name=strcat('Records/Europa_',num2str(ice_thickness),...
         'km_surface/',num2str(ff,'%03d'),'_MX');
     
     recordEsurf=rsac([record_name 'E.SAC']);
     recordNsurf=rsac([record_name 'N.SAC']);
     recordZsurf=rsac([record_name 'Z.SAC']);
     
-     record_name=strcat('/Users/marusiak/Documents/Gattaca/Europa_constant_Tc/Europa_',num2str(ice_thickness),...
+     record_name=strcat('Records/Europa_',num2str(ice_thickness),...
         'km_deep/',num2str(ff,'%03d'),'_MX');
     
     recordEdeep=rsac([record_name 'E.SAC']);
