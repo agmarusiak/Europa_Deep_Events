@@ -9,8 +9,8 @@ addpath('/Users/marusiak/Documents/MATLAB/saclab'); % add required sac code
 
 % set desired model parameters
 noise_strength='pref'; % set desired strength A=lease noise, D=most noise, pref=preferred
-ice_thickness=20; % either 5 or 20 (km)
-event_depth='surface'; % either surface or deep 
+ice_thickness=35; % either 5 or 20 (km)
+event_depth='deep'; % either surface or deep 
 
 cat=1; % catalog, either 0, 2 3 or 3. Most only have 0 or 1
 
@@ -23,10 +23,10 @@ scale=10.^(3/2.*Mw+9.1)/(3.98e13); % scales seismograms to desired magnitude
 % get records without noise
 for k=1:179 % distances
  
-    record_name=strcat('Records/Europa_',...
-        num2str(ice_thickness),'km_',event_depth,'_dirac/',num2str(k,'%03d'),'_MX');
+    record_name=strcat('Records/Eur_',...
+        num2str(ice_thickness),'km_',event_depth,'/',num2str(k,'%03d'),'_MX');
     
-    if k==10
+    if k==82
     record_E_10=rsac([record_name 'E.SAC']); % saves waveform at distance of 10 degrees
     record_N_10=rsac([record_name 'N.SAC']);
     record_Z_10=rsac([record_name 'Z.SAC']);
@@ -40,7 +40,8 @@ for k=1:179 % distances
 end
 
 %read in noise models
-noise_name=strcat('noise_records/ice',num2str(ice_thickness),'.',noise_strength,'_cat',num2str(cat),'.MX');
+%noise_name=strcat('noise_records/ice',num2str(ice_thickness),'.',noise_strength,'_cat',num2str(cat),'.MX');
+noise_name=strcat('noise_records/ice',num2str(ice_thickness),'km.MX')
 noise_E=rsac([noise_name 'E']);
 noise_N=rsac([noise_name 'N']);
 noise_Z=rsac([noise_name 'Z']);
@@ -189,7 +190,9 @@ tapered=detrended.*tukeywin(length(record_Z_10(:,2))-2,0.95);
  
  % Load noise files created using python code and grab noise time series
  % (nt)
-noise_name=strcat('noise_records/ice',num2str(ice_thickness),'_',noise_strength,'_cat',num2str(cat),'_MX');
+%noise_name=strcat('noise_records/ice',num2str(ice_thickness),'_',noise_strength,'_cat',num2str(cat),'_MX');
+noise_name=strcat('noise_records/ice',num2str(ice_thickness),'km_MX');
+
 nt=transpose(europa_noise(noise_name,npts,dt,'m','acc',0));  
 
 
@@ -203,78 +206,52 @@ subplot(2,3,1)
 % title('Background noise')
 
 subplot(2,3,1)
-plot(record_E_10(1:end-2,1),diff(record_E_10(:,2),2)*scale(1)+nt)
-
+plot(record_E_10(1:end-2,1),(diff(record_E_10(:,2),2)*scale(2)+nt).*10^9)
+set(gca,'FontSize',20)
 xlabel('Time (s)')
-ylabel('Acc. Amp. (m/s^2)')
-title(['Radial Mw ', num2str(Mw(1)),' with noise'])
-xlim([00 1000])
-subplot(2,3,2)
-plot(record_E_10(1:end-2,1),diff(record_E_10(:,2),2)*scale(2)+nt)
-xlabel('Time (s)')
-ylabel('Acc. Amp. (m/s^2)')
+ylabel('Acc. Amp. (nm/s^2)')
 title(['Radial Mw ', num2str(Mw(2)),' with noise'])
-xlim([00 1000])
-subplot(2,3,3)
-plot(record_E_10(1:end-2,1),diff(record_E_10(:,2),2)*scale(3)+nt)
+xlim([00 3300])
+subplot(2,3,2)
+plot(record_E_10(1:end-2,1),(diff(record_E_10(:,2),2)*scale(3)+nt).*10^9)
 xlabel('Time (s)')
-ylabel('Acc. Amp. (m/s^2)')
+ylabel('Acc. Amp. (nm/s^2)')
 title(['Radial Mw ', num2str(Mw(3)),' with noise'])
-xlim([00 1000])
-% subplot(3,4,5)
-% plot(record_N_10(1:end-2,1),nt)
-% xlabel('Time (s)')
-% ylabel('Acc amplitude')
-% title('Noise')
-% xlim([00 1000])
-% subplot(2,3,4)
-% plot(record_N_10(1:end-2,1),diff(record_N_10(:,2),2)*scale(1)+nt)
-% title('Background Noise')
-% xlabel('Time (s)')
-% ylabel('Acc. Amp. (m/s^2)')
-% xlim([00 1000])
-% title(['Transverse Mw ', num2str(Mw(1)),' with noise'])
-% subplot(2,3,5)
-% plot(record_N_10(1:end-2,1),diff(record_N_10(:,2),2)*scale(2)+nt)
-% xlabel('Time (s)')
-% ylabel('Acc. Amp. (m/s^2)')
-% title(['Transverse Mw ', num2str(Mw(2)),' with noise'])
-% xlim([00 1000])
-% subplot(3,4,8)
-% plot(record_N_10(1:end-2,1),diff(record_N_10(:,2),2)*scale(3)+nt)
-% xlabel('Time (s)')
-% ylabel('Acc. Amp. (m/s^2)')
-% xlim([00 1000])
-% title(['Transverse Mw ', num2str(Mw(3)),' with noise'])
-% subplot(3,4,9)
-% plot(record_Z_10(1:end-2,1),nt)
-% xlim([00 1000])
-% xlabel('Time (s)')
-% ylabel('Acc amplitude')
-% title('Background Noise')
+xlim([00 3300])
+set(gca,'FontSize',20)
+subplot(2,3,3)
+plot(record_E_10(1:end-2,1),(diff(record_E_10(:,2),2)*scale(4)+nt).*10^9)
+xlabel('Time (s)')
+ylabel('Acc. Amp. (nm/s^2)')
+title(['Radial Mw ', num2str(Mw(4)),' with noise'])
+xlim([00 3300])
+set(gca,'FontSize',20)
  subplot(2,3,4)
-plot(record_Z_10(1:end-2,1),diff(record_Z_10(:,2),2)*scale(1)+nt)
+plot(record_Z_10(1:end-2,1),(diff(record_Z_10(:,2),2)*scale(2)+nt).*10^9)
 title('Background Noise')
 xlabel('Time (s)')
-xlim([00 1000])
-ylabel('Acc. Amp. (m/s^2)')
-title(['Vertical Mw ', num2str(Mw(1)),' with noise'])
-subplot(2,3,5)
-plot(record_Z_10(1:end-2,1),diff(record_Z_10(:,2),2)*scale(2)+nt)
-xlabel('Time (s)')
-xlim([00 1000])
-ylabel('Acc. Amp. (m/s^2)')
+xlim([00 3300])
+set(gca,'FontSize',20)
+ylabel('Acc. Amp. (nm/s^2)')
 title(['Vertical Mw ', num2str(Mw(2)),' with noise'])
-subplot(2,3,6)
-plot(record_Z_10(1:end-2,1),diff(record_Z_10(:,2),2)*scale(3)+nt)
+subplot(2,3,5)
+plot(record_Z_10(1:end-2,1),(diff(record_Z_10(:,2),2)*scale(3)+nt).*10^9)
 xlabel('Time (s)')
-ylabel('Acc. Amp. (m/s^2)')
-xlim([00 1000])
+xlim([00 3300])
+set(gca,'FontSize',20)
+ylabel('Acc. Amp. (nm/s^2)')
 title(['Vertical Mw ', num2str(Mw(3)),' with noise'])
+subplot(2,3,6)
+plot(record_Z_10(1:end-2,1),(diff(record_Z_10(:,2),2)*scale(4)+nt).*10^9)
+xlabel('Time (s)')
+ylabel('Acc. Amp. (nm/s^2)')
+xlim([00 3300])
+set(gca,'FontSize',20)
+title(['Vertical Mw ', num2str(Mw(4)),' with noise'])
 
 %%
 figure(4)
-jj=3; % set desited magnitude from scaled array 
+jj=2; % set desited magnitude from scaled array 
 % plot of spectrograms with noise 
 %freqrange=logspace(-1,3,1000);
 subplot(2,1,1)
@@ -317,39 +294,39 @@ for h=1:179
 end
 figure(5) % plot distance vs time vs signal to noise ratios
 colormap(flipud(gray))
-imagesc(1:1:179,1:dt:1200,SNRE')
+imagesc(1:1:179,1:dt:3600,SNRE')
 
 %imagesc(1:1:179,1:dt:1200,abs(diff(record_E,2))')
 h=colorbar;
 %caxis([0 max(max(abs(diff(record_E,2))'))/100])
-caxis([1 100])
+caxis([1 10])
 ylabel(h, 'SNR')
 set(gca,'Ydir','normal')
 xlabel('Distance (deg)')
 ylabel('Time (s)')
 
 title([ event_depth ' Radial Mag ' num2str(Mw(jj))])
-figure(6)
-colormap(flipud(gray))
-imagesc(1:1:179,1:dt:1200,abs(diff(record_N,2))')
-h = colorbar;
-ylabel(h, 'SNR')
-
-%caxis([0 max(max(abs(diff(record_E,2))))/100])
-caxis([1 100])
-set(gca,'Ydir','normal')
-xlabel('Distance (deg)')
-ylabel('Time (s)')
-
-title([ event_depth ' Transverse Mag ' num2str(Mw(jj))])
+% figure(6)
+% colormap(flipud(gray))
+% imagesc(1:1:179,1:dt:3600,abs(diff(record_N,2))')
+% h = colorbar;
+% ylabel(h, 'SNR')
+% 
+% %caxis([0 max(max(abs(diff(record_E,2))))/100])
+% caxis([1 50])
+% set(gca,'Ydir','normal')
+% xlabel('Distance (deg)')
+% ylabel('Time (s)')
+% 
+% title([ event_depth ' Transverse Mag ' num2str(Mw(jj))])
 figure(8)
 colormap(flipud(gray))
 %imagesc(1:1:179,1:dt:1200,abs(diff(record_Z,2))')
-imagesc(1:1:179,1:dt:1200,SNRZ')
+imagesc(1:1:179,1:dt:3600,SNRZ')
 h = colorbar;
 ylabel(h, 'SNR')
 %caxis([0 max(max(abs(diff(record_E,2))'))/1000])
-caxis([1 1000])
+caxis([1 10])
 set(gca,'Ydir','normal')
 xlabel('Distance (deg)')
 ylabel('Time (s)')
@@ -378,7 +355,7 @@ plot(1./TC(:,1),20.*log10(TC(:,2)),'g')
 [pxx f]=periodogram((diff(record_Z_10(:,2),2).*scale(jj)+nt),[],[],Fs,'power');
 pxx(1)=[];
 f(1)=[];
-plot(1./f,10*log10(pxx),'k--')
+plot(1./f,10*log10(pxx),'r--')
 %plot(1./f,10.*log10(smooth(pxx,10)),'b')
 
 legend('STS2','SP','LISP','TC',['Magnitude ' num2str(Mw(jj))])
@@ -388,6 +365,7 @@ legend('STS2','SP','LISP','TC',['Magnitude ' num2str(Mw(jj))])
     STS2_resamp=interp1(1./STS2(:,1),20*log10(STS2(:,2)),1./f(3:end),'method','extrap');
     TC_resamp=interp1(1./TC(:,1),20*log10(TC(:,2)),1./f(3:end),'method','extrap');
     LISP_resamp=interp1(1./LISP(:,1),20*log10(LISP(:,2)),1./f(3:end),'method','extrap');
+     over_inst=[];
     for ii=1:179
        [pxx f]=periodogram(seismoZ(ii,:),[],[],Fs,'power');
        pxx(1:3)=[];
@@ -405,18 +383,22 @@ ylabel('Period (s)')
 title([num2str(ice_thickness) ' km shell, ' num2str(event_depth) ', Vertical Comp., Mw ' num2str(Mw(jj))])
 
 %% Compare deep and shallow events
-ice_thickness=20;
+ice_thickness=5;
 for ff=1:179
     
-     record_name=strcat('Records/Europa_',num2str(ice_thickness),...
-        'km_surface_dirac/',num2str(ff,'%03d'),'_MX');
+    % record_name=strcat('Records/Europa_',num2str(ice_thickness),...
+         record_name=strcat('Records/Eur_',num2str(ice_thickness),...
+        'km_surface/',num2str(ff,'%03d'),'_MX');
+    %'km_deep_dirac/',num2str(ww,'%03d'),'_MX');
     
     recordEsurf=rsac([record_name 'E.SAC']);
     recordNsurf=rsac([record_name 'N.SAC']);
     recordZsurf=rsac([record_name 'Z.SAC']);
     
-     record_name=strcat('Records/Europa_',num2str(ice_thickness),...
-        'km_deep_dirac/',num2str(ff,'%03d'),'_MX');
+     %record_name=strcat('Records/Europa_',num2str(ice_thickness),...
+     record_name=strcat('Records/Eur_',num2str(ice_thickness),...
+        'km_deep/',num2str(ff,'%03d'),'_MX');
+    %'km_deep_dirac/',num2str(ww,'%03d'),'_MX');
     
     recordEdeep=rsac([record_name 'E.SAC']);
     recordNdeep=rsac([record_name 'N.SAC']);
@@ -432,18 +414,20 @@ hold on
 plot(1:179,smooth(record_E_ratio),'b--',...
     1:179,smooth(record_Z_ratio),'r--','LineWidth',2)
 
-ice_thickness=5;
+ice_thickness=50;
 for ff=1:179
     
-     record_name=strcat('Records/Europa_',num2str(ice_thickness),...
-        'km_surface_dirac/',num2str(ff,'%03d'),'_MX');
+     record_name=strcat('Records/Eur_',num2str(ice_thickness),...
+        'km_surface/',num2str(ff,'%03d'),'_MX');
+    %'km_deep_dirac/',num2str(ww,'%03d'),'_MX');
     
     recordEsurf=rsac([record_name 'E.SAC']);
     recordNsurf=rsac([record_name 'N.SAC']);
     recordZsurf=rsac([record_name 'Z.SAC']);
     
-     record_name=strcat('Records/Europa_',num2str(ice_thickness),...
-        'km_deep_dirac/',num2str(ff,'%03d'),'_MX');
+     record_name=strcat('Records/Eur_',num2str(ice_thickness),...
+       'km_deep/',num2str(ff,'%03d'),'_MX');
+    %'km_deep_dirac/',num2str(ww,'%03d'),'_MX');
     
     recordEdeep=rsac([record_name 'E.SAC']);
     recordNdeep=rsac([record_name 'N.SAC']);
@@ -465,8 +449,31 @@ xlabel('Distance (deg)')
 title('Deep vs Surface RMS Ratio')
 set(gca,'FontSize',30)
 set(gca,'YScale',"log")
-legend('Radial 20 km','Vertical 20 km', 'Radial 5 km','Vertical 5 km','Equivalent RMS Amplitude')
+legend('Radial 5 km','Vertical 5 km', 'Radial 20 km','Vertical 20 km','Equivalent RMS Amplitude')
 
+%%
 
+ice_thicknesses=[5,10,20,35,50];
 
-ice_thickness=20;
+for j=1:length(ice_thicknesses)
+    for ww=1:179;
+        record_name=strcat('Records/Eur_',num2str(ice_thicknesses(j)),...
+         'km_deep/',num2str(ww,'%03d'),'_MX');
+    %'km_deep_dirac/',num2str(ww,'%03d'),'_MX');
+        
+        recordZdeep=rsac([record_name 'Z.SAC']);
+        [pxx f]=periodogram((diff(recordZdeep(:,2),2).*scale(6)),[],[],Fs,'power');
+        TC_resamp=interp1(1./TC(:,1),20*log10(TC(:,2)),1./f(3:end),'method','extrap');
+         pxx(1:2)=[];
+        f(1:2)=[];
+        over_inst=smooth(10*log10(pxx),2)-TC_resamp;
+        detectability(j,ww)=max(over_inst);
+    end
+    detectability_smooth(j,:)=smooth(detectability(j,:));
+end
+figure
+plot(1:179,detectability_smooth,'LineWidth',1.5)
+xlabel('Distance')
+ylabel('Maximum power of TC instrument (dB)')
+title(['M_w ' num2str(Mw(6)) ' Signal Strength'])
+legend([num2str(ice_thicknesses')])
